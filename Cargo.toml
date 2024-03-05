@@ -1,5 +1,5 @@
 [package]
-name = "kass-browser"
+name = "pluto-browser"
 version = "0.0.0"
 edition = "2021"
 
@@ -20,6 +20,7 @@ gobject-sys = "^0.18.0"
 gtk = "^0.18.0"
 gtk-sys = "^0.18.0"
 webkit2gtk = "2.0.1"
+atk = "0.18.0"
 
   [dependencies.java_script_core]
   package = "javascriptcore-rs"
