@@ -1,9 +1,17 @@
 use axum::{routing::get, Router};
 
-pub fn routes() -> Router {
-    Router::new().route("/auth", get(handle_auth))
+pub struct AuthRouter {
+    pub router: Router,
 }
 
-async fn handle_auth() -> &'static str {
-    "Hello, User!"
+impl AuthRouter {
+    pub fn new() -> Self {
+        Self {
+            router: Router::new().route("/auth", get(Self::handle_auth())),
+        }
+    }
+
+    pub fn handle_auth() -> String {
+        "Hello, Account".to_string()
+    }
 }
