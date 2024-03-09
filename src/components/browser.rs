@@ -11,8 +11,6 @@ impl Browser {
         let webview = WebView::new();
 
         // Load initial URL
-        // let uri = "https://crates.io";
-        // webview.load_uri(&uri);
         webview.set_expand(true);
 
         Browser { widget: webview }

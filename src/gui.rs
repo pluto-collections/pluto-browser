@@ -1,4 +1,7 @@
-use crate::components::{browser, searchbar};
+use crate::components::{
+    browser,
+    searchbar::{self, get_url},
+};
 use gtk::prelude::*;
 
 pub fn build_ui(application: &gtk::Application) {
@@ -25,6 +28,7 @@ pub fn build_ui(application: &gtk::Application) {
     // Connect the searchbar to the browser
     searchbar.get_widget().connect_activate(move |entry| {
         let uri = entry.text();
+        let uri = get_url(&uri.to_string());
         browser.update_uri(&uri);
     });
 
