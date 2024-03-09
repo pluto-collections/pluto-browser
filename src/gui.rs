@@ -3,6 +3,7 @@ use crate::components::{
     searchbar::{self, get_url},
 };
 use gtk::prelude::*;
+use webkit2gtk::WebViewExt;
 
 pub fn build_ui(application: &gtk::Application) {
     // Create a window
@@ -20,17 +21,27 @@ pub fn build_ui(application: &gtk::Application) {
     vbox.set_expand(true);
 
     let browser = browser::Browser::new();
+    let browser_clone = browser.clone();
     let searchbar = searchbar::SearchBar::new();
+    let searchbar_clone = searchbar.clone();
     vbox.add(searchbar.get_widget());
 
     vbox.add(browser.get_widget());
 
     // Connect the searchbar to the browser
-    searchbar.get_widget().connect_activate(move |entry| {
+    searchbar_clone.get_widget().connect_activate(move |entry| {
         let uri = entry.text();
         let uri = get_url(&uri.to_string());
         browser.update_uri(&uri);
     });
+
+    // update the uri when the webview changes
+    browser_clone
+        .get_widget()
+        .connect_uri_notify(move |webview| {
+            let uri = webview.uri().unwrap();
+            searchbar.get_widget().set_text(&uri);
+        });
 
     // Show all widgets
     window.show_all();

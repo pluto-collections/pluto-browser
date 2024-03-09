@@ -4,6 +4,7 @@ pub enum SearchType {
     Search,
 }
 
+#[derive(Clone)]
 pub struct SearchBar {
     widget: gtk::Entry,
 }
@@ -50,7 +51,6 @@ pub fn get_search_type(entry: &String) -> SearchType {
     SearchType::Search
 }
 
-#[allow(dead_code)]
 pub fn add_http_to_entry(entry: &String) -> String {
     if entry.starts_with("http") {
         entry.clone()

@@ -1,6 +1,7 @@
 use gtk::prelude::WidgetExt;
 use webkit2gtk::{WebView, WebViewExt};
 
+#[derive(Clone)]
 pub struct Browser {
     widget: WebView,
 }
