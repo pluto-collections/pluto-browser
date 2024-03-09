@@ -12,3 +12,10 @@ tokio = { version = "1.2", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 hyper = "1.2.0"
 tower = "0.4"
+
+[dev-dependencies]
+cargo-watch = "8.5.2"
+
+[package.metadata.watch]
+watch = "cargo watch -x run --bin server"
+
