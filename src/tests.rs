@@ -38,3 +38,13 @@ fn add_http_to_entry_test() {
         );
     }
 }
+
+#[test]
+fn is_child_in_box_test() {
+    let _ = gtk::init();
+    let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
+    let button = gtk::Button::new();
+    vbox.add(&button);
+
+    assert_eq!(true, crate::utils::is_child_in_box(&vbox, &button));
+}
