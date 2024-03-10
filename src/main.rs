@@ -11,7 +11,7 @@ mod utils;
 
 fn main() -> std::io::Result<()> {
     let application = gtk::Application::new(
-        Some("com.github.accessibility"),
+        Some("com.github.pluto_browser"),
         gio::ApplicationFlags::empty(),
     );
     application.connect_activate(|app| {
