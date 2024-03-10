@@ -1,5 +1,5 @@
 use crate::components::{
-    browser,
+    browser, headerbar,
     searchbar::{self, get_url},
 };
 use gtk::prelude::*;
@@ -11,10 +11,8 @@ pub fn build_ui(application: &gtk::Application) {
     window.set_title("Pluto Browser");
     window.set_default_size(800, 600);
 
-    // Connect destroy event to quit the application
-    window.connect_destroy(|_| {
-        gtk::main_quit();
-    });
+    let headerbar = headerbar::Headerbar::new();
+    window.set_titlebar(Some(headerbar.get_widget()));
 
     let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
     window.add(&vbox);
@@ -28,6 +26,9 @@ pub fn build_ui(application: &gtk::Application) {
 
     vbox.add(browser.get_widget());
 
+    // Show all widgets
+    window.show_all();
+
     // Connect the searchbar to the browser
     searchbar_clone.get_widget().connect_activate(move |entry| {
         let uri = entry.text();
@@ -36,6 +37,7 @@ pub fn build_ui(application: &gtk::Application) {
     });
 
     // update the uri when the webview changes
+    let browser_ref = &browser_clone;
     browser_clone
         .get_widget()
         .connect_uri_notify(move |webview| {
@@ -43,6 +45,11 @@ pub fn build_ui(application: &gtk::Application) {
             searchbar.get_widget().set_text(&uri);
         });
 
-    // Show all widgets
-    window.show_all();
+    browser_ref
+        .get_widget()
+        .connect_load_changed(move |webview, _| {
+            if let Some(title) = webview.title() {
+                window.set_title(&format!("{} - Pluto Browser", title));
+            }
+        });
 }
