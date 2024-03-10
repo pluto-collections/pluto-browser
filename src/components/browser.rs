@@ -1,6 +1,7 @@
 use gtk::prelude::WidgetExt;
 use webkit2gtk::{WebView, WebViewExt};
 
+#[derive(Clone)]
 pub struct Browser {
     widget: WebView,
 }
@@ -11,8 +12,6 @@ impl Browser {
         let webview = WebView::new();
 
         // Load initial URL
-        // let uri = "https://crates.io";
-        // webview.load_uri(&uri);
         webview.set_expand(true);
 
         Browser { widget: webview }
