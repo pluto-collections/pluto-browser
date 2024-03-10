@@ -6,13 +6,14 @@ use gtk::prelude::*;
 use webkit2gtk::WebViewExt;
 
 pub fn build_ui(application: &gtk::Application) {
-    // Create a window
+    //=========================================================================
+    // BUILD UI
+    //=========================================================================
     let window = gtk::ApplicationWindow::new(application);
     window.set_title("Pluto Browser");
     window.set_default_size(800, 600);
 
     let headerbar = headerbar::Headerbar::new();
-    window.set_titlebar(Some(headerbar.get_widget()));
 
     let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
     window.add(&vbox);
@@ -22,12 +23,21 @@ pub fn build_ui(application: &gtk::Application) {
     let browser_clone = browser.clone();
     let searchbar = searchbar::SearchBar::new();
     let searchbar_clone = searchbar.clone();
-    vbox.add(searchbar.get_widget());
 
+    //=========================================================================
+    // ADD WIDGETS
+    //=========================================================================
+    window.set_titlebar(Some(headerbar.get_widget()));
+
+    vbox.add(searchbar.get_widget());
     vbox.add(browser.get_widget());
 
     // Show all widgets
     window.show_all();
+
+    //=========================================================================
+    // CONNECT SIGNALS
+    //=========================================================================
 
     // Connect the searchbar to the browser
     searchbar_clone.get_widget().connect_activate(move |entry| {
