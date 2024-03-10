@@ -7,6 +7,8 @@ use gtk::prelude::*;
 
 mod components;
 mod gui;
+#[cfg(test)]
+mod tests;
 mod utils;
 
 fn main() -> std::io::Result<()> {
