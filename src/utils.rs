@@ -30,19 +30,6 @@ pub fn get_search_type(entry: &String) -> SearchType {
     SearchType::Search
 }
 
-#[allow(dead_code)]
-pub fn add_https_to_entry(entry: &String) -> String {
-    // is localhost
-    if entry.contains("localhost") {
-        return add_http_to_entry(entry);
-    }
-
-    if entry.starts_with("http") {
-        entry.clone()
-    } else {
-        format!("https://{}", entry)
-    }
-}
 pub fn add_http_to_entry(entry: &String) -> String {
     if entry.starts_with("http") {
         entry.clone()
