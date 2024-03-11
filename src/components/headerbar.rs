@@ -16,8 +16,4 @@ impl Headerbar {
     pub fn get_widget(&self) -> &gtk::HeaderBar {
         &self.headerbar
     }
-
-    pub fn set_title(&self, title: String) {
-        self.headerbar.set_title(Some(title.as_str()));
-    }
 }
