@@ -2,6 +2,7 @@
 pub enum SearchType {
     Url,
     Search,
+    File,
 }
 
 #[derive(Clone)]
@@ -32,6 +33,13 @@ pub fn get_url(entry: &String) -> String {
             url::Url::parse_with_params("https://www.google.com/search", &[("q", entry)])
                 .unwrap()
                 .to_string()
+        }
+        SearchType::File => {
+            if entry.starts_with("file://") {
+                entry.trim().to_string()
+            } else {
+                format!("file://{}", entry.trim())
+            }
         }
     }
 }
