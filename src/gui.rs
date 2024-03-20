@@ -25,10 +25,12 @@ pub fn build_ui(application: &gtk::Application) {
     let searchbar = searchbar::SearchBar::new();
     let previous_button = button::WebViewButton::new(Some("go-previous"));
     let next_button = button::WebViewButton::new(Some("go-next"));
+    let refresh_button = button::WebViewButton::new(Some("view-refresh"));
 
     vbox.add(searchbar.get_widget());
     vbox.add(&previous_button.button);
     vbox.add(&next_button.button);
+    vbox.add(&refresh_button.button);
     vbox.add(browser.get_widget());
 
     // Connect the button to the browser
@@ -42,7 +44,13 @@ pub fn build_ui(application: &gtk::Application) {
     next_button
         .button
         .connect_clicked(clone!(@strong browser => move |_| {
-            browser.get_widget().go_back();
+            browser.get_widget().go_forward();
+        }));
+
+    refresh_button
+        .button
+        .connect_clicked(clone!(@strong browser => move |_| {
+            browser.get_widget().reload();
         }));
 
     // Connect the searchbar to the browser
