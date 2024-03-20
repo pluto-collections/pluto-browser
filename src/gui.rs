@@ -18,6 +18,7 @@ pub fn build_ui(application: &gtk::Application) {
     });
 
     let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
+    let hbox = gtk::Box::new(gtk::Orientation::Horizontal, 0);
     window.add(&vbox);
     vbox.set_expand(true);
 
@@ -27,11 +28,16 @@ pub fn build_ui(application: &gtk::Application) {
     let next_button = button::WebViewButton::new(Some("go-next"));
     let refresh_button = button::WebViewButton::new(Some("view-refresh"));
 
-    vbox.add(searchbar.get_widget());
-    vbox.add(&previous_button.button);
-    vbox.add(&next_button.button);
-    vbox.add(&refresh_button.button);
+    let button_container = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+
+    vbox.add(&hbox);
     vbox.add(browser.get_widget());
+
+    hbox.pack_start(&button_container, false, false, 20);
+    hbox.pack_start(&previous_button.button, false, false, 4);
+    hbox.pack_start(&next_button.button, false, false, 4);
+    hbox.pack_start(&refresh_button.button, false, false, 4);
+    hbox.pack_start(searchbar.get_widget(), true, true, 10);
 
     // Connect the button to the browser
     previous_button
