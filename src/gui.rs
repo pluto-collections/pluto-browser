@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::components::{
     browser, headerbar,
     searchbar::{self, get_url},
@@ -9,11 +11,11 @@ pub fn build_ui(application: &gtk::Application) {
     //=========================================================================
     // BUILD UI
     //=========================================================================
-    let window = gtk::ApplicationWindow::new(application);
+    let window = Rc::new(gtk::ApplicationWindow::new(application));
     window.set_title("Pluto Browser");
     window.set_default_size(800, 600);
 
-    let headerbar = headerbar::Headerbar::new();
+    let headerbar = headerbar::Headerbar::new(Rc::clone(&window));
 
     let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
     window.add(&vbox);

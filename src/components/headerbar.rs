@@ -1,6 +1,7 @@
+use glib::clone;
 use gtk::prelude::*;
 use gtk_sys::GTK_STYLE_CLASS_TITLE;
-use std::str;
+use std::{rc::Rc, str};
 
 pub struct Headerbar {
     pub headerbar: gtk::Box,
@@ -10,7 +11,7 @@ pub struct Headerbar {
 }
 
 impl Headerbar {
-    pub fn new() -> Self {
+    pub fn new(window: Rc<gtk::ApplicationWindow>) -> Self {
         let headerbar = gtk::Box::new(gtk::Orientation::Horizontal, 0);
         headerbar.set_size_request(10, 10);
         headerbar.set_hexpand(true);
@@ -28,10 +29,6 @@ impl Headerbar {
         };
         let title_class = title_class.to_string();
         let title_class = title_class.trim();
-
-        // for (i, letter) in title_class.char_indices() {
-        //     println!("{}: {}", i, letter);
-        // }
 
         // load css file
         title
@@ -72,6 +69,22 @@ impl Headerbar {
 
         headerbar.style_context().add_class("headerbar");
         headerbar.add(&title);
+
+        maximize_btn.connect_clicked(clone!(@weak window => move |_| {
+            if window.is_maximized() {
+                window.unmaximize();
+            } else {
+                window.maximize();
+            }
+        }));
+
+        minimize_btn.connect_clicked(clone!(@weak window => move |_| {
+            window.iconify();
+        }));
+
+        close_btn.connect_clicked(clone!(@weak window => move |_| {
+            window.close();
+        }));
 
         Headerbar {
             headerbar,
