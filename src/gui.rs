@@ -1,48 +1,48 @@
-use crate::components::{
-    browser,
-    searchbar::{self, get_url},
-};
+use std::rc::Rc;
+
+use crate::components::{browser, headerbar};
 use gtk::prelude::*;
 use webkit2gtk::WebViewExt;
 
 pub fn build_ui(application: &gtk::Application) {
-    // Create a window
-    let window = gtk::ApplicationWindow::new(application);
-    window.set_title("Pluto Browser");
+    //=========================================================================
+    // BUILD UI
+    //=========================================================================
+    let window = Rc::new(gtk::ApplicationWindow::new(application));
     window.set_default_size(800, 600);
 
-    // Connect destroy event to quit the application
-    window.connect_destroy(|_| {
-        gtk::main_quit();
-    });
+    let css_provider = Rc::new(gtk::CssProvider::new());
+    let css_file = include_str!("./styles/style.css");
+    css_provider.load_from_data(css_file.as_bytes()).unwrap();
+
+    let headerbar = headerbar::Headerbar::new(Rc::clone(&css_provider));
 
     let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
     window.add(&vbox);
     vbox.set_expand(true);
 
-    let browser = browser::Browser::new();
-    let browser_clone = browser.clone();
-    let searchbar = searchbar::SearchBar::new();
-    let searchbar_clone = searchbar.clone();
-    vbox.add(searchbar.get_widget());
+    let browser = Rc::new(browser::Browser::new());
+
+    //=========================================================================
+    // ADD WIDGETS
+    //=========================================================================
+    window.set_titlebar(Some(headerbar.get_widget()));
 
     vbox.add(browser.get_widget());
 
-    // Connect the searchbar to the browser
-    searchbar_clone.get_widget().connect_activate(move |entry| {
-        let uri = entry.text();
-        let uri = get_url(&uri.to_string());
-        browser.update_uri(&uri);
-    });
-
-    // update the uri when the webview changes
-    browser_clone
-        .get_widget()
-        .connect_uri_notify(move |webview| {
-            let uri = webview.uri().unwrap();
-            searchbar.get_widget().set_text(&uri);
-        });
-
     // Show all widgets
+    window.set_title("Pluto Browser");
     window.show_all();
+    headerbar.connect_searchbar_with_browser(Rc::clone(&browser));
+
+    //=========================================================================
+    // CONNECT SIGNALS
+    //=========================================================================
+    browser
+        .get_widget()
+        .connect_load_changed(move |webview, _| {
+            if let Some(title) = webview.title() {
+                window.set_title(&format!("{} - Pluto Browser", title));
+            }
+        });
 }
