@@ -33,6 +33,9 @@ impl Headerbar {
         let browser_copy = browser.clone();
         self.searchbar.get_widget().connect_activate(move |entry| {
             let uri = entry.text();
+            if uri.trim().is_empty() {
+                return;
+            }
             let uri = get_url(&uri.to_string());
             browser_copy.update_uri(&uri);
         });
