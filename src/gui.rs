@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::components::{ browser, headerbar};
+use crate::components::{browser, headerbar};
 use gtk::prelude::*;
 use webkit2gtk::WebViewExt;
 
@@ -9,7 +9,6 @@ pub fn build_ui(application: &gtk::Application) {
     // BUILD UI
     //=========================================================================
     let window = Rc::new(gtk::ApplicationWindow::new(application));
-    window.set_title("Pluto Browser");
     window.set_default_size(800, 600);
 
     let css_provider = Rc::new(gtk::CssProvider::new());
@@ -32,6 +31,7 @@ pub fn build_ui(application: &gtk::Application) {
     vbox.add(browser.get_widget());
 
     // Show all widgets
+    window.set_title("Pluto Browser");
     window.show_all();
     headerbar.connect_searchbar_with_browser(Rc::clone(&browser));
 

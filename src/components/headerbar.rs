@@ -2,7 +2,9 @@ use super::{
     browser::Browser,
     searchbar::{get_url, SearchBar},
 };
-use gtk::prelude::{EntryExt, HeaderBarExt};
+use gdk::gdk_pixbuf::{InterpType, Pixbuf};
+use glib::ObjectExt;
+use gtk::prelude::{ContainerExt, EntryExt, FixedExt, HeaderBarExt, ImageExtManual, WidgetExt};
 use std::rc::Rc;
 use webkit2gtk::WebViewExt;
 
@@ -18,6 +20,14 @@ impl Headerbar {
         headerbar.set_show_close_button(true);
 
         headerbar.set_custom_title(Some(searchbar.get_widget()));
+
+        let logo_path = "assets/pluto.png";
+
+        let pixbuf = Pixbuf::from_file(logo_path).unwrap();
+        let pixbuf = pixbuf.scale_simple(20, 20, InterpType::Bilinear).unwrap();
+        let image = gtk::Image::from_pixbuf(Some(&pixbuf));
+        image.set_size_request(30, 30);
+        headerbar.pack_start(&image);
 
         Headerbar {
             headerbar,
