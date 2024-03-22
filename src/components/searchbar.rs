@@ -1,3 +1,7 @@
+use std::rc::Rc;
+
+use gtk::prelude::{EntryExt, WidgetExt};
+
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
 pub enum SearchType {
     Url,
@@ -11,9 +15,11 @@ pub struct SearchBar {
 }
 
 impl SearchBar {
-    pub fn new() -> Self {
+    pub fn new(css_provider: Rc<gtk::CssProvider>) -> Self {
         // Create a new SearchEntry
         let search_entry = gtk::Entry::new();
+        search_entry.set_hexpand(true);
+        search_entry.set_placeholder_text(Some("Search or enter address"));
 
         SearchBar {
             widget: search_entry,
