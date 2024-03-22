@@ -3,8 +3,7 @@ use super::{
     searchbar::{get_url, SearchBar},
 };
 use gdk::gdk_pixbuf::{InterpType, Pixbuf};
-use glib::ObjectExt;
-use gtk::prelude::{ContainerExt, EntryExt, FixedExt, HeaderBarExt, ImageExtManual, WidgetExt};
+use gtk::prelude::{EntryExt, HeaderBarExt, WidgetExt};
 use std::rc::Rc;
 use webkit2gtk::WebViewExt;
 
