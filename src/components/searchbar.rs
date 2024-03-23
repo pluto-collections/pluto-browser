@@ -1,7 +1,11 @@
+use gtk::prelude::{EntryExt, StyleContextExt, WidgetExt};
+use std::rc::Rc;
+
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
 pub enum SearchType {
     Url,
     Search,
+    File,
 }
 
 #[derive(Clone)]
@@ -10,9 +14,11 @@ pub struct SearchBar {
 }
 
 impl SearchBar {
-    pub fn new() -> Self {
+    pub fn new(_css_provider: Rc<gtk::CssProvider>) -> Self {
         // Create a new SearchEntry
         let search_entry = gtk::Entry::new();
+        search_entry.set_hexpand(true);
+        search_entry.set_placeholder_text(Some("Search or enter address"));
 
         SearchBar {
             widget: search_entry,
@@ -33,5 +39,13 @@ pub fn get_url(entry: &String) -> String {
                 .unwrap()
                 .to_string()
         }
+        SearchType::File => {
+            if entry.starts_with("file://") {
+                entry.trim().to_string()
+            } else {
+                format!("file://{}", entry.trim())
+            }
+        }
     }
 }
+
