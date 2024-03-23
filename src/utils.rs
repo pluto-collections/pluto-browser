@@ -4,6 +4,11 @@ use gtk::Box;
 use crate::components::searchbar::SearchType;
 
 pub fn get_search_type(entry: &String) -> SearchType {
+    // if the entry starts with / or file:// then it's a file
+    if entry.starts_with("/") || entry.starts_with("file://") {
+        return SearchType::File;
+    }
+
     // add https:// to the entry if it doesn't have it
     let entry = if entry.starts_with("http") {
         entry.clone()
@@ -11,6 +16,8 @@ pub fn get_search_type(entry: &String) -> SearchType {
         format!("https://{}", entry)
     }
     .to_lowercase();
+
+    let entry = entry.trim();
 
     let re = regex::Regex::new(
         r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)",
@@ -22,11 +29,9 @@ pub fn get_search_type(entry: &String) -> SearchType {
     let re_localhost = regex::Regex::new(r"https?:\/\/localhost(:\d+)?").unwrap_or_else(|_| {
         panic!("Invalid regex");
     });
-
     if re.is_match(&entry) || re_localhost.is_match(&entry) {
         return SearchType::Url;
     }
-
     SearchType::Search
 }
 
