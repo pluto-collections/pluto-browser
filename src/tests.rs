@@ -12,6 +12,8 @@ fn get_search_type_test() {
         ("https", SearchType::Search),
         ("ftp://google.com", SearchType::Search),
         ("http://google.com", SearchType::Url),
+        ("/home/user/file.txt", SearchType::File),
+        ("file:///home/user/file.txt", SearchType::File),
     ];
 
     for (string, search_type) in strings_with_types.iter() {
@@ -26,7 +28,7 @@ fn add_http_to_entry_test() {
         ("http://localhost:8000", "http://localhost:8000"),
         ("google", "http://google"),
         ("http://google.com", "http://google.com"),
-        ("https", "http://https"),
+        ("https", "https"),
         ("ftp://google.com", "http://ftp://google.com"),
         ("http://google.com", "http://google.com"),
     ];
