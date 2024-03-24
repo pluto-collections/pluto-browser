@@ -4,7 +4,7 @@ use super::{
 };
 use gdk::gdk_pixbuf::{InterpType, Pixbuf};
 use gtk::prelude::{EntryExt, HeaderBarExt, WidgetExt};
-use std::rc::Rc;
+use std::{io::Cursor, rc::Rc};
 use webkit2gtk::WebViewExt;
 
 pub struct Headerbar {
@@ -20,9 +20,9 @@ impl Headerbar {
 
         headerbar.set_custom_title(Some(searchbar.get_widget()));
 
-        let logo_path = "assets/pluto.png";
-
-        let pixbuf = Pixbuf::from_file(logo_path).unwrap();
+        let logo_bytes: &[u8] = include_bytes!("../../assets/pluto.png");
+        let reader = Cursor::new(logo_bytes);
+        let pixbuf = Pixbuf::from_read(reader).unwrap();
         let pixbuf = pixbuf.scale_simple(20, 20, InterpType::Bilinear).unwrap();
         let image = gtk::Image::from_pixbuf(Some(&pixbuf));
         image.set_size_request(30, 30);
