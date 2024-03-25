@@ -10,9 +10,9 @@ impl Browser {
     pub fn new() -> Self {
         // Create a new WebView
         let webview = WebView::new();
-        let settings = WebViewExt::settings(&webview).unwrap();
-        settings.set_enable_developer_extras(true);
 
+        let web_settings = WebViewExt::settings(&webview).unwrap();
+        web_settings.set_enable_developer_extras(true);
         // Load initial URL
         webview.set_expand(true);
 
