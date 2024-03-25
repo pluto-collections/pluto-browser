@@ -7,8 +7,9 @@ edition = "2021"
 
 [dependencies]
 axum = "^0.7"
-sqlx = { version = "0.7", features = ["postgres"] }
 tokio = { version = "1.2", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 hyper = "1.2.0"
 tower = "0.4"
+diesel = { version = "2.1.0", features = ["postgres"] }
+dotenvy = "0.15"
