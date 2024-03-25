@@ -46,3 +46,4 @@ pub fn build_ui(application: &gtk::Application) {
             }
         });
 }
+

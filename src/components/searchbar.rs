@@ -1,6 +1,5 @@
-use std::rc::Rc;
-
 use gtk::prelude::{EntryExt, StyleContextExt, WidgetExt};
+use std::rc::Rc;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
 pub enum SearchType {
@@ -49,3 +48,4 @@ pub fn get_url(entry: &String) -> String {
         }
     }
 }
+

@@ -1,5 +1,5 @@
 use gtk::prelude::WidgetExt;
-use webkit2gtk::{WebView, WebViewExt};
+use webkit2gtk::{SettingsExt, WebView, WebViewExt};
 
 #[derive(Clone)]
 pub struct Browser {
@@ -11,6 +11,8 @@ impl Browser {
         // Create a new WebView
         let webview = WebView::new();
 
+        let web_settings = WebViewExt::settings(&webview).unwrap();
+        web_settings.set_enable_developer_extras(true);
         // Load initial URL
         webview.set_expand(true);
 
