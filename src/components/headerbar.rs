@@ -1,6 +1,6 @@
 use super::{
     browser::Browser,
-    searchbar::{get_url, SearchBar},
+    searchbar::{get_url, SearchBar, SearchType},
 };
 use gdk::gdk_pixbuf::{InterpType, Pixbuf};
 use gtk::prelude::{EntryExt, HeaderBarExt, WidgetExt};
@@ -45,7 +45,14 @@ impl Headerbar {
             if uri.trim().is_empty() {
                 return;
             }
-            let uri = get_url(&uri.to_string());
+            let search_type = crate::utils::get_search_type(&uri.to_string());
+
+            if search_type == SearchType::About {
+                browser_copy.load_about_pages(&uri.to_string());
+                return;
+            }
+
+            let uri = get_url(&uri.to_string(), search_type);
             browser_copy.update_uri(&uri);
         });
 
