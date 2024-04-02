@@ -1,4 +1,4 @@
-use gtk::prelude::{EntryExt, StyleContextExt, WidgetExt};
+use gtk::prelude::{EntryExt, WidgetExt};
 use std::rc::Rc;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
@@ -48,4 +48,3 @@ pub fn get_url(entry: &String) -> String {
         }
     }
 }
-
