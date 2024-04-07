@@ -18,5 +18,14 @@
 
   <body class="container">
     Oops! The page you are looking for does not exist.
+
+    <button id="try_again">Try again</button>
   </body>
+
+  <script>
+    const tryAgain = document.getElementById("try_again");
+    tryAgain.addEventListener("click", () => {
+      window.location.reload();
+    });
+  </script>
 </html>
