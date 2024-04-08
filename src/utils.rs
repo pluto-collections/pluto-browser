@@ -4,9 +4,15 @@ use gtk::Box;
 use crate::components::searchbar::SearchType;
 
 pub fn get_search_type(entry: &String) -> SearchType {
+    let entry = entry.trim().to_string();
+
     // if the entry starts with / or file:// then it's a file
     if entry.starts_with("/") || entry.starts_with("file://") {
         return SearchType::File;
+    }
+
+    if entry.starts_with("about:") {
+        return SearchType::About;
     }
 
     // add https:// to the entry if it doesn't have it

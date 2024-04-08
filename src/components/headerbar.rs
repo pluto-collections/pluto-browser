@@ -1,11 +1,10 @@
 use super::{
     browser::Browser,
-    searchbar::{get_url, SearchBar},
+    searchbar::{get_url, SearchBar, SearchType},
 };
 use gdk::gdk_pixbuf::{InterpType, Pixbuf};
-use glib::ObjectExt;
-use gtk::prelude::{ContainerExt, EntryExt, FixedExt, HeaderBarExt, ImageExtManual, WidgetExt};
-use std::rc::Rc;
+use gtk::prelude::{EntryExt, HeaderBarExt, WidgetExt};
+use std::{io::Cursor, rc::Rc};
 use webkit2gtk::WebViewExt;
 
 pub struct Headerbar {
@@ -21,9 +20,9 @@ impl Headerbar {
 
         headerbar.set_custom_title(Some(searchbar.get_widget()));
 
-        let logo_path = "assets/pluto.png";
-
-        let pixbuf = Pixbuf::from_file(logo_path).unwrap();
+        let logo_bytes: &[u8] = include_bytes!("../../assets/pluto.png");
+        let reader = Cursor::new(logo_bytes);
+        let pixbuf = Pixbuf::from_read(reader).unwrap();
         let pixbuf = pixbuf.scale_simple(20, 20, InterpType::Bilinear).unwrap();
         let image = gtk::Image::from_pixbuf(Some(&pixbuf));
         image.set_size_request(30, 30);
@@ -46,7 +45,14 @@ impl Headerbar {
             if uri.trim().is_empty() {
                 return;
             }
-            let uri = get_url(&uri.to_string());
+            let search_type = crate::utils::get_search_type(&uri.to_string());
+
+            if search_type == SearchType::About {
+                browser_copy.load_about_pages(&uri.to_string());
+                return;
+            }
+
+            let uri = get_url(&uri.to_string(), search_type);
             browser_copy.update_uri(&uri);
         });
 
