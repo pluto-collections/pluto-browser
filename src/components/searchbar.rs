@@ -6,6 +6,7 @@ pub enum SearchType {
     Url,
     Search,
     File,
+    About,
 }
 
 #[derive(Clone)]
@@ -30,8 +31,7 @@ impl SearchBar {
     }
 }
 
-pub fn get_url(entry: &String) -> String {
-    let search_type = crate::utils::get_search_type(&entry);
+pub fn get_url(entry: &String, search_type: SearchType) -> String {
     match search_type {
         SearchType::Url => crate::utils::add_http_to_entry(entry),
         SearchType::Search => {
@@ -46,5 +46,6 @@ pub fn get_url(entry: &String) -> String {
                 format!("file://{}", entry.trim())
             }
         }
+        SearchType::About => entry.trim().to_string(),
     }
 }
