@@ -73,7 +73,7 @@ impl ActionButtons {
                     refresh_button.set_icon_name("process-stop");
                     is_refreshing.set(true);
                 }
-                LoadEvent::Committed => {
+                LoadEvent::Finished => {
                     refresh_button.set_icon_name("view-refresh");
                     is_refreshing.set(false);
                 }
