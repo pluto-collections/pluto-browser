@@ -1,14 +1,16 @@
 use super::{browser::Browser, button};
 use glib::clone;
-use gtk::prelude::{BoxExt, ButtonExt, ContainerExt};
+use gtk::prelude::{BoxExt, ButtonExt};
 use std::cell::Cell;
 use std::rc::Rc;
 use webkit2gtk::{LoadEvent, WebViewExt};
 
 pub struct ActionButtons {
+    container: Rc<gtk::Box>,
     previous_button: Rc<button::WebViewButton>,
     next_button: Rc<button::WebViewButton>,
     refresh_button: Rc<button::WebViewButton>,
+    home_button: Rc<button::WebViewButton>,
     is_refreshing: Rc<Cell<bool>>,
 }
 
@@ -17,27 +19,26 @@ impl ActionButtons {
         let previous_button = Rc::new(button::WebViewButton::new(Some("go-previous")));
         let next_button = Rc::new(button::WebViewButton::new(Some("go-next")));
         let refresh_button = Rc::new(button::WebViewButton::new(Some("view-refresh")));
+        let home_button = Rc::new(button::WebViewButton::new(Some("go-home")));
 
-        let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
-        let hbox = gtk::Box::new(gtk::Orientation::Horizontal, 0);
-
-        vbox.add(&hbox);
+        let hbox = Rc::new(gtk::Box::new(gtk::Orientation::Horizontal, 0));
+        hbox.pack_start(&previous_button.button, false, false, 4);
+        hbox.pack_start(&next_button.button, false, false, 4);
+        hbox.pack_start(&refresh_button.button, false, false, 4);
+        hbox.pack_start(&home_button.button, false, false, 4);
 
         ActionButtons {
             is_refreshing: Rc::new(Cell::new(false)),
             previous_button,
             next_button,
             refresh_button,
+            home_button,
+            container: hbox,
         }
     }
 
-    pub fn get_widget(&self) -> gtk::Box {
-        let hbox = gtk::Box::new(gtk::Orientation::Horizontal, 0);
-        hbox.pack_start(&self.previous_button.button, false, false, 4);
-        hbox.pack_start(&self.next_button.button, false, false, 4);
-        hbox.pack_start(&self.refresh_button.button, false, false, 4);
-
-        hbox
+    pub fn get_widget(&self) -> Rc<gtk::Box> {
+        Rc::clone(&self.container)
     }
     pub fn connect_action_with_browser(&self, browser: Rc<Browser>) {
         // Connect the button to the browser
@@ -63,6 +64,12 @@ impl ActionButtons {
                 } else {
                     browser.get_widget().reload();
                 }
+            }));
+
+        self.home_button
+            .button
+            .connect_clicked(clone!(@strong browser => move |_| {
+                browser.load_about_pages(&"about:home".to_string());
             }));
 
         let refresh_button = Rc::clone(&self.refresh_button);

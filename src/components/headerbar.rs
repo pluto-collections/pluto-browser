@@ -32,7 +32,7 @@ impl Headerbar {
         image.set_size_request(30, 30);
         headerbar.pack_start(&image);
 
-        headerbar.add(&action_btn.get_widget());
+        headerbar.add(&*action_btn.get_widget());
         Headerbar {
             headerbar,
             searchbar,
