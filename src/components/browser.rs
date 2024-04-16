@@ -24,6 +24,8 @@ impl Browser {
         // by default, load homepage
         webview.load_html(homepage_html, None);
 
+        let web_settings = WebViewExt::settings(&webview).unwrap();
+        web_settings.set_enable_developer_extras(true);
         // Load initial URL
         webview.set_expand(true);
 

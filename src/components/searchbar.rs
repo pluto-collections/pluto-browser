@@ -1,6 +1,5 @@
-use std::rc::Rc;
-
 use gtk::prelude::{EntryExt, WidgetExt};
+use std::rc::Rc;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
 pub enum SearchType {
