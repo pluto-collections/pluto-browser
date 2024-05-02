@@ -22,11 +22,13 @@
       overlays = [ (import rust-overlay) ];
       pkgs = import nixpkgs { inherit system overlays; };
       rust_toolchain = pkgs.pkgsBuildHost.rust-bin.stable.${version}.default.override {
-      	extensions = [ "rust-analyzer" "clippy" ];
+        extensions = [
+          "rust-analyzer"
+          "clippy"
+        ];
       };
       buildInputs = with pkgs; [
         rust_toolchain
-        pkg-config
         gst_all_1.gstreamer
         gst_all_1.gst-plugins-base
         gst_all_1.gst-plugins-good
@@ -34,15 +36,32 @@
         gst_all_1.gst-plugins-ugly
         gst_all_1.gst-libav
         gst_all_1.gst-vaapi
-      ];
-      nativeBuildInputs = with pkgs; [
-        openssl
+        pkg-config
         pango
-        glib
         cacert
-        glib-networking
+        gdk-pixbuf
         webkitgtk_4_1
         gcc
+        gtk3
+	libsoup
+        cairo
+        haskellPackages.webkit2gtk3-javascriptcore
+        openssl_3
+      ];
+      nativeBuildInputs = with pkgs; [
+        openssl.dev
+        pkg-config
+        pango
+        glib
+        glib-networking
+        gdk-pixbuf
+        webkitgtk_4_1
+        gcc
+        # gtk3
+        haskellPackages.webkit2gtk3-javascriptcore
+        cairo
+        openssl_3
+        librsvg
       ];
     in
     with pkgs;
@@ -53,5 +72,25 @@
           export GIO_MODULE_DIR=${glib-networking}/lib/gio/modules/
         '';
       };
+      packages.${system}.pluto-browser =
+        let
+          manifest = (lib.importTOML ./Cargo.toml).package;
+        in
+        rustPlatform.buildRustPackage {
+          pname = "${manifest.name}";
+          version = manifest.version;
+          inherit buildInputs nativeBuildInputs;
+          cargoLock.lockFile = ./Cargo.lock;
+	  doCheck = false;
+          src = fetchFromGitHub {
+            owner = "pluto-collections";
+            repo = "pluto-browser";
+            rev = "master";
+            hash = "sha256-mQorimpJipM4tbGzkX7OEbsNGeEm9ntXxTuDtd4KzuE=";
+          };
+	  shellHook = ''
+          	export GIO_MODULE_DIR=${glib-networking}/lib/gio/modules/
+	  '';
+        };
     };
 }
