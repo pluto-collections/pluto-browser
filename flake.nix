@@ -21,7 +21,13 @@
       rust-version = "1.77.0";
       overlays = [ (import rust-overlay) ];
       pkgs = import nixpkgs { inherit system overlays; };
-      rust_toolchain = pkgs.pkgsBuildHost.rust-bin.stable.${rust-version}.default;
+      rust_toolchain = pkgs.pkgsBuildHost.rust-bin.stable.${rust-version}.default.override
+          {
+            extensions = [
+              "rust-analyzer"
+              "clippy"
+            ];
+          };
       buildInputs = with pkgs; [
         pkg-config
         webkitgtk_4_1
@@ -55,16 +61,7 @@
     with pkgs;
     {
       devShells.${system}.default = mkShell {
-        inherit nativeBuildInputs;
-        buildInputs = buildInputs ++ [
-          rust_toolchain.override
-          {
-            extensions = [
-              "rust-analyzer"
-              "clippy"
-            ];
-          }
-        ];
+        inherit buildInputs nativeBuildInputs;
         shellHook = ''
         	export GIO_MODULE_DIR=${glib-networking}/lib/gio/modules/
           	export GST_PLUGIN_SYSTEM_PATH_1_0=${gst_all_1.gstreamer.out}/lib/gstreamer-1.0:${gst_all_1.gst-plugins-base}/lib/gstreamer-1.0:${gst_all_1.gst-plugins-good}/lib/gstreamer-1.0:${gst_all_1.gst-plugins-bad}/lib/gstreamer-1.0:${gst_all_1.gst-plugins-ugly}/lib/gstreamer-1.0
