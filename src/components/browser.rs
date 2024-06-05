@@ -17,13 +17,23 @@ pub struct Browser {
 }
 
 impl Browser {
-    pub fn new() -> Self {
+    pub fn default() -> Self {
         let webview = Arc::new(SingleWebView::new());
 
         Browser {
             tabs: vec![webview],
             position: 0,
         }
+    }
+
+    pub fn new_webview(&mut self) {
+        self.tabs.push(Arc::new(SingleWebView::new()));
+        self.position += 1;
+        println!(
+            "total length: {}, current position: {}",
+            self.tabs.len(),
+            self.position
+        );
     }
 
     pub fn get_current(&self) -> Arc<SingleWebView> {

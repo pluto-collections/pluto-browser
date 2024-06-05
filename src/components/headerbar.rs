@@ -1,17 +1,22 @@
 use super::{
     action_buttons,
-    browser::SingleWebView,
+    browser::{Browser, SingleWebView},
+    button,
     searchbar::{get_url, SearchBar, SearchType},
 };
 use gdk::gdk_pixbuf::{InterpType, Pixbuf};
-use gtk::prelude::{ContainerExt, EntryExt, HeaderBarExt, WidgetExt};
-use std::{io::Cursor, sync::Arc};
+use gtk::prelude::{ButtonExt, ContainerExt, EntryExt, HeaderBarExt, WidgetExt};
+use std::{
+    io::Cursor,
+    sync::{Arc, Mutex},
+};
 use webkit2gtk::WebViewExt;
 
 pub struct Headerbar {
     headerbar: gtk::HeaderBar,
     searchbar: Arc<SearchBar>,
     action_btn: action_buttons::ActionButtons,
+    add_button: Arc<button::WebViewButton>,
 }
 
 impl Headerbar {
@@ -20,6 +25,7 @@ impl Headerbar {
         let headerbar = gtk::HeaderBar::new();
         let searchbar = Arc::new(SearchBar::new(css_provider));
         let action_btn = action_buttons::ActionButtons::new(css_provider_copy);
+        let add_button = Arc::new(button::WebViewButton::new(Some("list-add")));
         headerbar.set_show_close_button(true);
 
         headerbar.set_custom_title(Some(searchbar.get_widget()));
@@ -33,10 +39,12 @@ impl Headerbar {
         headerbar.pack_start(&image);
 
         headerbar.add(&*action_btn.get_widget());
+        headerbar.add(&add_button.button);
         Headerbar {
             headerbar,
             searchbar,
             action_btn,
+            add_button,
         }
     }
 
@@ -67,6 +75,29 @@ impl Headerbar {
         browser.get_widget().connect_uri_notify(move |webview| {
             let uri = webview.uri().unwrap();
             searchbar.get_widget().set_text(&uri);
+        });
+    }
+
+    pub fn connect_add_button_with_browser(&self, browser: Arc<Mutex<Browser>>, vbox: gtk::Box) {
+        let browser = Arc::clone(&browser);
+
+        self.add_button.button.connect_clicked(move |_| {
+            let mut browser = browser.lock().unwrap();
+            browser.new_webview();
+
+            // Remove the current webview from vbox
+            let children: Vec<_> = vbox.children();
+            for child in children {
+                vbox.remove(&child);
+            }
+
+            // Add the new webview to vbox
+            let current_webview = browser.get_current();
+            let new_webview = current_webview.get_widget();
+            vbox.add(new_webview);
+
+            // Show all widgets
+            vbox.show_all();
         });
     }
 }

@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use crate::components::{browser, headerbar};
 use gtk::prelude::*;
@@ -21,24 +21,27 @@ pub fn build_ui(application: &gtk::Application) {
     window.add(&vbox);
     vbox.set_expand(true);
 
-    let browser = Arc::new(browser::Browser::new());
+    let browser = Arc::new(Mutex::new(browser::Browser::default()));
 
     //=========================================================================
     // ADD WIDGETS
     //=========================================================================
     window.set_titlebar(Some(headerbar.get_widget()));
 
-    vbox.add(browser.get_current().get_widget());
+    vbox.add(browser.lock().unwrap().get_current().get_widget());
 
     // Show all widgets
     window.set_title("Pluto Browser");
     window.show_all();
-    headerbar.connect_searchbar_with_browser(Arc::clone(&browser.get_current()));
+    headerbar.connect_searchbar_with_browser(Arc::clone(&browser.lock().unwrap().get_current()));
+    headerbar.connect_add_button_with_browser(Arc::clone(&browser), vbox);
 
     //=========================================================================
     // CONNECT SIGNALS
     //=========================================================================
     browser
+        .lock()
+        .unwrap()
         .get_current()
         .get_widget()
         .connect_load_changed(move |webview, _| {
