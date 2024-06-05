@@ -1,24 +1,24 @@
 use super::{
     action_buttons,
-    browser::Browser,
+    browser::SingleWebView,
     searchbar::{get_url, SearchBar, SearchType},
 };
 use gdk::gdk_pixbuf::{InterpType, Pixbuf};
 use gtk::prelude::{ContainerExt, EntryExt, HeaderBarExt, WidgetExt};
-use std::{io::Cursor, rc::Rc};
+use std::{io::Cursor, sync::Arc};
 use webkit2gtk::WebViewExt;
 
 pub struct Headerbar {
     headerbar: gtk::HeaderBar,
-    searchbar: Rc<SearchBar>,
+    searchbar: Arc<SearchBar>,
     action_btn: action_buttons::ActionButtons,
 }
 
 impl Headerbar {
-    pub fn new(css_provider: Rc<gtk::CssProvider>) -> Self {
-        let css_provider_copy = Rc::clone(&css_provider);
+    pub fn new(css_provider: Arc<gtk::CssProvider>) -> Self {
+        let css_provider_copy = Arc::clone(&css_provider);
         let headerbar = gtk::HeaderBar::new();
-        let searchbar = Rc::new(SearchBar::new(css_provider));
+        let searchbar = Arc::new(SearchBar::new(css_provider));
         let action_btn = action_buttons::ActionButtons::new(css_provider_copy);
         headerbar.set_show_close_button(true);
 
@@ -44,7 +44,7 @@ impl Headerbar {
         &self.headerbar
     }
 
-    pub fn connect_searchbar_with_browser(&self, browser: Rc<Browser>) {
+    pub fn connect_searchbar_with_browser(&self, browser: Arc<SingleWebView>) {
         let browser_copy = browser.clone();
         self.action_btn.connect_action_with_browser(browser.clone());
         self.searchbar.get_widget().connect_activate(move |entry| {
@@ -63,7 +63,7 @@ impl Headerbar {
             browser_copy.update_uri(&uri);
         });
 
-        let searchbar = Rc::clone(&self.searchbar);
+        let searchbar = Arc::clone(&self.searchbar);
         browser.get_widget().connect_uri_notify(move |webview| {
             let uri = webview.uri().unwrap();
             searchbar.get_widget().set_text(&uri);

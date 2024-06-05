@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use gtk::prelude::WidgetExt;
 use webkit2gtk::{SettingsExt, WebView, WebViewExt};
 
@@ -10,13 +12,37 @@ pub enum AboutType {
 
 #[derive(Clone)]
 pub struct Browser {
-    widget: WebView,
+    tabs: Vec<Arc<SingleWebView>>,
+    position: usize,
 }
 
 impl Browser {
     pub fn new() -> Self {
+        let webview = Arc::new(SingleWebView::new());
+
+        Browser {
+            tabs: vec![webview],
+            position: 0,
+        }
+    }
+
+    pub fn get_current(&self) -> Arc<SingleWebView> {
+        Arc::clone(&self.tabs[self.position])
+    }
+}
+
+#[derive(Clone)]
+pub struct SingleWebView {
+    widget: WebView,
+}
+
+impl SingleWebView {
+    pub fn new() -> Self {
+        // create a webcontext
+        let web_context = webkit2gtk::WebContext::default().unwrap();
+
         // Create a new WebView
-        let webview = WebView::new();
+        let webview = WebView::with_context(&web_context);
         let settings = WebViewExt::settings(&webview).unwrap();
         settings.set_enable_developer_extras(true);
         let homepage_html = include_str!("../pages/homepage.html");
@@ -29,7 +55,7 @@ impl Browser {
         // Load initial URL
         webview.set_expand(true);
 
-        Browser { widget: webview }
+        SingleWebView { widget: webview }
     }
 
     pub fn get_widget(&self) -> &WebView {

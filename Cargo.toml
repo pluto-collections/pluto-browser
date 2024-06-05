@@ -24,6 +24,7 @@ webkit2gtk = "2.0.1"
 atk = "0.18.0"
 regex = "1.10.3"
 url = "2.5.0"
+tokio = { version = "1.37.0", features = ["full"] }
 
   [dependencies.java_script_core]
   package = "javascriptcore-rs"
