@@ -81,6 +81,8 @@ impl Headerbar {
     pub fn connect_add_button_with_browser(&self, browser: Arc<Mutex<Browser>>, vbox: gtk::Box) {
         let browser = Arc::clone(&browser);
 
+        let searchbar = Arc::clone(&self.searchbar);
+
         self.add_button.button.connect_clicked(move |_| {
             let mut browser = browser.lock().unwrap();
             browser.new_webview();
@@ -98,6 +100,8 @@ impl Headerbar {
 
             // Show all widgets
             vbox.show_all();
+            let url_text = current_webview.url_text.lock().unwrap();
+            searchbar.get_widget().set_text(url_text.as_str());
         });
     }
 }

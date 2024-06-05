@@ -1,5 +1,6 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
+use glib::PropertySet;
 use gtk::prelude::WidgetExt;
 use webkit2gtk::{SettingsExt, WebView, WebViewExt};
 
@@ -29,11 +30,6 @@ impl Browser {
     pub fn new_webview(&mut self) {
         self.tabs.push(Arc::new(SingleWebView::new()));
         self.position += 1;
-        println!(
-            "total length: {}, current position: {}",
-            self.tabs.len(),
-            self.position
-        );
     }
 
     pub fn get_current(&self) -> Arc<SingleWebView> {
@@ -44,6 +40,7 @@ impl Browser {
 #[derive(Clone)]
 pub struct SingleWebView {
     widget: WebView,
+    pub url_text: Arc<Mutex<String>>,
 }
 
 impl SingleWebView {
@@ -65,7 +62,10 @@ impl SingleWebView {
         // Load initial URL
         webview.set_expand(true);
 
-        SingleWebView { widget: webview }
+        SingleWebView {
+            widget: webview,
+            url_text: Arc::new(Mutex::new(String::new())),
+        }
     }
 
     pub fn get_widget(&self) -> &WebView {
@@ -74,6 +74,7 @@ impl SingleWebView {
 
     pub fn update_uri(&self, uri: &str) {
         self.widget.load_uri(uri);
+        self.url_text.set(uri.to_string());
     }
 
     fn get_about_type(uri: &String) -> AboutType {
