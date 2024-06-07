@@ -27,8 +27,8 @@ pub fn build_ui(application: &gtk::Application) {
     // ADD WIDGETS
     //=========================================================================
     window.set_titlebar(Some(headerbar.get_widget()));
-
-    vbox.add(browser.lock().unwrap().get_current().get_widget());
+    vbox.add(&browser.lock().unwrap().notebook);
+    // browser.lock().unwrap().notebook.set_expand(true);
 
     // Show all widgets
     window.set_title("Pluto Browser");
@@ -46,7 +46,7 @@ pub fn build_ui(application: &gtk::Application) {
         .get_widget()
         .connect_load_changed(move |webview, _| {
             if let Some(title) = webview.title() {
-                window.set_title(&format!("{} - Pluto Browser", title));
+                window.set_title(&format!("{} — Pluto Browser", title));
             }
         });
 }

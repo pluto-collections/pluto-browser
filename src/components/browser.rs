@@ -1,7 +1,10 @@
 use std::sync::{Arc, Mutex};
 
 use glib::PropertySet;
-use gtk::prelude::WidgetExt;
+use gtk::{
+    prelude::{NotebookExtManual, WidgetExt},
+    Label, Notebook,
+};
 use webkit2gtk::{SettingsExt, WebView, WebViewExt};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -13,23 +16,36 @@ pub enum AboutType {
 
 #[derive(Clone)]
 pub struct Browser {
-    tabs: Vec<Arc<SingleWebView>>,
+    pub notebook: Notebook,
+    pub tabs: Vec<Arc<SingleWebView>>,
     position: usize,
 }
 
 impl Browser {
     pub fn default() -> Self {
         let webview = Arc::new(SingleWebView::new());
+        let label = Label::new(Some("New Tab")); // Create a tab label
+        let notebook = Notebook::new();
+        notebook.append_page(webview.get_widget(), Some(&label));
+        notebook.set_expand(true);
+        notebook.set_vexpand(true);
 
         Browser {
+            notebook,
             tabs: vec![webview],
             position: 0,
         }
     }
 
     pub fn new_webview(&mut self) {
+        let webview = Arc::new(SingleWebView::new());
         self.tabs.push(Arc::new(SingleWebView::new()));
-        self.position += 1;
+        self.position = self.tabs.len() - 1;
+
+        let label = Label::new(Some("New Tab")); // Create a tab label
+        self.notebook
+            .append_page(webview.get_widget(), Some(&label));
+        self.notebook.set_current_page(Some(self.position as u32));
     }
 
     pub fn get_current(&self) -> Arc<SingleWebView> {

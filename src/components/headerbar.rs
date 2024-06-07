@@ -87,16 +87,7 @@ impl Headerbar {
             let mut browser = browser.lock().unwrap();
             browser.new_webview();
 
-            // Remove the current webview from vbox
-            let children: Vec<_> = vbox.children();
-            for child in children {
-                vbox.remove(&child);
-            }
-
-            // Add the new webview to vbox
             let current_webview = browser.get_current();
-            let new_webview = current_webview.get_widget();
-            vbox.add(new_webview);
 
             // Show all widgets
             vbox.show_all();
