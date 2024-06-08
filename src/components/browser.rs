@@ -1,10 +1,6 @@
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
-use glib::PropertySet;
-use gtk::{
-    prelude::{NotebookExtManual, WidgetExt},
-    Label, Notebook,
-};
+use gtk::prelude::WidgetExt;
 use webkit2gtk::{SettingsExt, WebView, WebViewExt};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -16,36 +12,18 @@ pub enum AboutType {
 
 #[derive(Clone)]
 pub struct Browser {
-    pub notebook: Notebook,
-    pub tabs: Vec<Arc<SingleWebView>>,
+    tabs: Vec<Arc<SingleWebView>>,
     position: usize,
 }
 
 impl Browser {
-    pub fn default() -> Self {
+    pub fn new() -> Self {
         let webview = Arc::new(SingleWebView::new());
-        let label = Label::new(Some("New Tab")); // Create a tab label
-        let notebook = Notebook::new();
-        notebook.append_page(webview.get_widget(), Some(&label));
-        notebook.set_expand(true);
-        notebook.set_vexpand(true);
 
         Browser {
-            notebook,
             tabs: vec![webview],
             position: 0,
         }
-    }
-
-    pub fn new_webview(&mut self) {
-        let webview = Arc::new(SingleWebView::new());
-        self.tabs.push(Arc::new(SingleWebView::new()));
-        self.position = self.tabs.len() - 1;
-
-        let label = Label::new(Some("New Tab")); // Create a tab label
-        self.notebook
-            .append_page(webview.get_widget(), Some(&label));
-        self.notebook.set_current_page(Some(self.position as u32));
     }
 
     pub fn get_current(&self) -> Arc<SingleWebView> {
@@ -56,7 +34,6 @@ impl Browser {
 #[derive(Clone)]
 pub struct SingleWebView {
     widget: WebView,
-    pub url_text: Arc<Mutex<String>>,
 }
 
 impl SingleWebView {
@@ -78,10 +55,7 @@ impl SingleWebView {
         // Load initial URL
         webview.set_expand(true);
 
-        SingleWebView {
-            widget: webview,
-            url_text: Arc::new(Mutex::new(String::new())),
-        }
+        SingleWebView { widget: webview }
     }
 
     pub fn get_widget(&self) -> &WebView {
@@ -90,7 +64,6 @@ impl SingleWebView {
 
     pub fn update_uri(&self, uri: &str) {
         self.widget.load_uri(uri);
-        self.url_text.set(uri.to_string());
     }
 
     fn get_about_type(uri: &String) -> AboutType {

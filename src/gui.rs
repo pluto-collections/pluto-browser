@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use crate::components::{browser, headerbar};
 use gtk::prelude::*;
@@ -21,32 +21,29 @@ pub fn build_ui(application: &gtk::Application) {
     window.add(&vbox);
     vbox.set_expand(true);
 
-    let browser = Arc::new(Mutex::new(browser::Browser::default()));
+    let browser = Arc::new(browser::Browser::new());
 
     //=========================================================================
     // ADD WIDGETS
     //=========================================================================
     window.set_titlebar(Some(headerbar.get_widget()));
-    vbox.add(&browser.lock().unwrap().notebook);
-    // browser.lock().unwrap().notebook.set_expand(true);
+
+    vbox.add(browser.get_current().get_widget());
 
     // Show all widgets
     window.set_title("Pluto Browser");
     window.show_all();
-    headerbar.connect_searchbar_with_browser(Arc::clone(&browser.lock().unwrap().get_current()));
-    headerbar.connect_add_button_with_browser(Arc::clone(&browser), vbox);
+    headerbar.connect_searchbar_with_browser(Arc::clone(&browser.get_current()));
 
     //=========================================================================
     // CONNECT SIGNALS
     //=========================================================================
     browser
-        .lock()
-        .unwrap()
         .get_current()
         .get_widget()
         .connect_load_changed(move |webview, _| {
             if let Some(title) = webview.title() {
-                window.set_title(&format!("{} — Pluto Browser", title));
+                window.set_title(&format!("{} - Pluto Browser", title));
             }
         });
 }
