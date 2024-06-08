@@ -41,6 +41,10 @@ impl Browser {
             Self::new_webview(stack_clone, stack_switcher_clone);
         });
 
+        let close_btn = Arc::new(gtk::Button::with_label("Close Tab"));
+        Self::handle_close_tab(Arc::clone(&close_btn), Arc::clone(&stack));
+        vbox.add(&*close_btn);
+
         Browser {
             headerbar,
             browser: vbox,
@@ -92,5 +96,23 @@ impl Browser {
         } else {
             println!("Position {} is out of bounds", position);
         }
+    }
+
+    fn handle_close_tab(btn: Arc<gtk::Button>, stack: Arc<Stack>) {
+        btn.connect_clicked(move |_| {
+            let stack = Arc::clone(&stack);
+            let current_child = stack.visible_child();
+            if let Some(current_child) = current_child {
+                if stack.children().len() > 1 {
+                    stack.remove(&current_child);
+                    Self::switch_to_child_at_position(
+                        Arc::clone(&stack),
+                        stack.children().len().saturating_sub(1),
+                    );
+                } else {
+                    gtk::main_quit();
+                }
+            }
+        });
     }
 }
