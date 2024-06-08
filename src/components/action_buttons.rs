@@ -4,6 +4,7 @@ use gtk::prelude::{BoxExt, ButtonExt};
 use std::{cell::Cell, sync::Arc};
 use webkit2gtk::{LoadEvent, WebViewExt};
 
+#[derive(Clone)]
 pub struct ActionButtons {
     container: Arc<gtk::Box>,
     previous_button: Arc<button::WebViewButton>,

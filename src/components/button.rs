@@ -1,6 +1,6 @@
 use gtk::prelude::ButtonExt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WebViewButton {
     pub button: gtk::Button,
 }

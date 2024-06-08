@@ -1,6 +1,7 @@
 use super::{
     action_buttons,
     browser::SingleWebView,
+    button::WebViewButton,
     searchbar::{get_url, SearchBar, SearchType},
 };
 use gdk::gdk_pixbuf::{InterpType, Pixbuf};
@@ -8,10 +9,12 @@ use gtk::prelude::{ContainerExt, EntryExt, HeaderBarExt, WidgetExt};
 use std::{io::Cursor, sync::Arc};
 use webkit2gtk::WebViewExt;
 
+#[derive(Clone)]
 pub struct Headerbar {
     headerbar: gtk::HeaderBar,
     searchbar: Arc<SearchBar>,
     action_btn: action_buttons::ActionButtons,
+    pub add_button: WebViewButton,
 }
 
 impl Headerbar {
@@ -33,9 +36,15 @@ impl Headerbar {
         headerbar.pack_start(&image);
 
         headerbar.add(&*action_btn.get_widget());
+
+        let add_button = WebViewButton::new(Some("list-add"));
+
+        headerbar.add(&add_button.button);
+
         Headerbar {
             headerbar,
             searchbar,
+            add_button,
             action_btn,
         }
     }
