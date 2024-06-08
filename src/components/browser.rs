@@ -65,10 +65,32 @@ impl Browser {
         // Load initial URL
         webview.set_expand(true);
 
-        stack.add_titled(&webview, Uuid::new_v4().to_string().as_str(), "New Tab");
-        stack.show_all();
+        let new_name_string = Uuid::new_v4().to_string();
+        let new_name = new_name_string.as_str();
 
+        stack.add_titled(&webview, new_name, "New Tab");
+
+        // Ensure that GTK processes pending events
+        while gtk::events_pending() {
+            gtk::main_iteration();
+        }
+
+        stack.show_all();
         stack_switcher.set_stack(Some(&*stack));
         stack_switcher.show_all();
+
+        Self::switch_to_child_at_position(
+            Arc::clone(&stack),
+            stack.children().len().saturating_sub(1),
+        );
+    }
+
+    fn switch_to_child_at_position(stack: Arc<Stack>, position: usize) {
+        let children = stack.children();
+        if position < children.len() {
+            stack.set_visible_child(&children[position]);
+        } else {
+            println!("Position {} is out of bounds", position);
+        }
     }
 }
