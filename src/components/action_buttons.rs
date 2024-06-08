@@ -1,8 +1,11 @@
-use super::{browser::SingleWebView, button};
-use glib::clone;
-use gtk::prelude::{BoxExt, ButtonExt};
+use super::{button, headerbar::load_about_pages};
+use glib::{clone, Cast};
+use gtk::{
+    prelude::{BoxExt, ButtonExt, StackExt, StackSwitcherExt},
+    StackSwitcher,
+};
 use std::{cell::Cell, sync::Arc};
-use webkit2gtk::{LoadEvent, WebViewExt};
+use webkit2gtk::{LoadEvent, WebView, WebViewExt};
 
 #[derive(Clone)]
 pub struct ActionButtons {
@@ -40,52 +43,64 @@ impl ActionButtons {
     pub fn get_widget(&self) -> Arc<gtk::Box> {
         Arc::clone(&self.container)
     }
-    pub fn connect_action_with_browser(&self, browser: Arc<SingleWebView>) {
-        // Connect the button to the browser
+
+    pub fn connect_action_with_browser(&self, stack_switcher: Arc<StackSwitcher>) {
+        // Assume `stack` is a gtk::Stack instance stored in the struct
+        let current_widget = stack_switcher.stack().and_then(|stack| {
+            // Get the currently visible child from the stack
+            stack.visible_child().and_then(|child| {
+                // Downcast the child to WebView
+                child.dynamic_cast::<WebView>().ok()
+            })
+        });
+
+        if current_widget.is_none() {
+            return;
+        }
+
+        let webview = current_widget.unwrap();
 
         self.previous_button
             .button
-            .connect_clicked(clone!(@strong browser => move |_| {
-                browser.get_widget().go_back();
+            .connect_clicked(clone!(@strong webview => move |_| {
+                webview.go_back();
             }));
-        // Connect the button to the browser
+        // Connect the button to the webview
         self.next_button
             .button
-            .connect_clicked(clone!(@strong browser => move |_| {
-                browser.get_widget().go_forward();
+            .connect_clicked(clone!(@strong webview => move |_| {
+                webview.go_forward();
             }));
 
         let is_refreshing = Arc::clone(&self.is_refreshing);
         self.refresh_button
             .button
-            .connect_clicked(clone!(@strong browser => move |_| {
+            .connect_clicked(clone!(@strong webview => move |_| {
                 if is_refreshing.get() {
-                    browser.get_widget().stop_loading();
+                    webview.stop_loading();
                 } else {
-                    browser.get_widget().reload();
+                    webview.reload();
                 }
             }));
 
         self.home_button
             .button
-            .connect_clicked(clone!(@strong browser => move |_| {
-                browser.load_about_pages(&"about:home".to_string());
+            .connect_clicked(clone!(@strong webview => move |_| {
+                load_about_pages(&"about:home".to_string(), Arc::clone(&stack_switcher));
             }));
 
         let refresh_button = Arc::clone(&self.refresh_button);
         let is_refreshing = Arc::clone(&self.is_refreshing);
-        browser.get_widget().connect_load_changed(
-            move |_, load_event: LoadEvent| match load_event {
-                LoadEvent::Started => {
-                    refresh_button.set_icon_name("process-stop");
-                    is_refreshing.set(true);
-                }
-                LoadEvent::Finished => {
-                    refresh_button.set_icon_name("view-refresh");
-                    is_refreshing.set(false);
-                }
-                _ => {}
-            },
-        );
+        webview.connect_load_changed(move |_, load_event: LoadEvent| match load_event {
+            LoadEvent::Started => {
+                refresh_button.set_icon_name("process-stop");
+                is_refreshing.set(true);
+            }
+            LoadEvent::Finished => {
+                refresh_button.set_icon_name("view-refresh");
+                is_refreshing.set(false);
+            }
+            _ => {}
+        });
     }
 }

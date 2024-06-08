@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use crate::components::browser;
 use gtk::prelude::*;
-use webkit2gtk::WebViewExt;
 
 pub fn build_ui(application: &gtk::Application) {
     //=========================================================================
