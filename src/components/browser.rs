@@ -1,6 +1,6 @@
+use glib::Cast;
 use gtk::{
-    prelude::{ButtonExt, ContainerExt, StackExt, StackSwitcherExt, WidgetExt},
-    Stack, StackSwitcher,
+    prelude::{ButtonExt, ContainerExt, GtkWindowExt, StackExt, StackSwitcherExt, WidgetExt}, ApplicationWindow, Stack, StackSwitcher
 };
 use std::sync::Arc;
 use uuid::Uuid;
@@ -12,14 +12,15 @@ use super::headerbar::Headerbar;
 pub struct Browser {
     pub headerbar: Headerbar,
     pub browser: gtk::Box,
+    pub stack: Arc<Stack>,
 }
 
 impl Browser {
-    pub fn new() -> Self {
+    pub fn new(window: Arc<ApplicationWindow>) -> Self {
         let stack = Arc::new(Stack::new());
         let stack_switcher = Arc::new(StackSwitcher::new());
 
-        Self::new_webview(Arc::clone(&stack), Arc::clone(&stack_switcher));
+        Self::new_webview(Arc::clone(&stack), Arc::clone(&stack_switcher), Arc::clone(&window));
 
         stack_switcher.set_stack(Some(&*stack));
 
@@ -38,7 +39,7 @@ impl Browser {
         headerbar.add_button.button.connect_clicked(move |_| {
             let stack_clone = Arc::clone(&stack_clone);
             let stack_switcher_clone = Arc::clone(&stack_switcher_clone);
-            Self::new_webview(stack_clone, stack_switcher_clone);
+            Self::new_webview(stack_clone, stack_switcher_clone, Arc::clone(&window));
         });
 
         let close_btn = Arc::new(gtk::Button::with_label("Close Tab"));
@@ -48,10 +49,11 @@ impl Browser {
         Browser {
             headerbar,
             browser: vbox,
+            stack,
         }
     }
 
-    fn new_webview(stack: Arc<Stack>, stack_switcher: Arc<StackSwitcher>) {
+    fn new_webview(stack: Arc<Stack>, stack_switcher: Arc<StackSwitcher>, window: Arc<ApplicationWindow>) {
         // create a webcontext
         let web_context = webkit2gtk::WebContext::default().unwrap();
 
@@ -87,6 +89,8 @@ impl Browser {
             Arc::clone(&stack),
             stack.children().len().saturating_sub(1),
         );
+
+        Self::connect_with_window_title(Arc::clone(&stack), Arc::clone(&window));
     }
 
     fn switch_to_child_at_position(stack: Arc<Stack>, position: usize) {
@@ -95,6 +99,26 @@ impl Browser {
             stack.set_visible_child(&children[position]);
         } else {
             println!("Position {} is out of bounds", position);
+        }
+    }
+
+    fn connect_with_window_title(stack: Arc<Stack>, window: Arc<ApplicationWindow>) {
+    let current_widget = 
+        // Get the currently visible child from the stack
+        stack.visible_child().and_then(|child| {
+            // Downcast the child to WebView
+            child.dynamic_cast::<WebView>().ok()
+        });
+
+    if let Some(webview) = current_widget {
+        let window = Arc::clone(&window);
+        webview.connect_load_changed(move |webview, _| {
+            if let Some(title) = webview.title() {
+                window.set_title(&format!("{} — Pluto Browser", title));
+            } else {
+                window.set_title("New Tab — Pluto Browser");
+            }
+        });
         }
     }
 

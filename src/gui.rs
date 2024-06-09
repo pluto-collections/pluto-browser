@@ -14,7 +14,7 @@ pub fn build_ui(application: &gtk::Application) {
     let css_file = include_str!("./styles/style.css");
     css_provider.load_from_data(css_file.as_bytes()).unwrap();
 
-    let browser = Arc::new(browser::Browser::new());
+    let browser = Arc::new(browser::Browser::new(Arc::clone(&window)));
 
     //=========================================================================
     // ADD WIDGETS
@@ -25,16 +25,4 @@ pub fn build_ui(application: &gtk::Application) {
     // Show all widgets
     window.set_title("Pluto Browser");
     window.show_all();
-
-    //=========================================================================
-    // CONNECT SIGNALS
-    //=========================================================================
-    // browser
-    //     .get_current()
-    //     .get_widget()
-    //     .connect_load_changed(move |webview, _| {
-    //         if let Some(title) = webview.title() {
-    //             window.set_title(&format!("{} - Pluto Browser", title));
-    //         }
-    //     });
 }
