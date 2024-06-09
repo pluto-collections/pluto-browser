@@ -28,11 +28,10 @@ pub struct Headerbar {
 }
 
 impl Headerbar {
-    pub fn new(css_provider: Arc<gtk::CssProvider>) -> Self {
-        let css_provider_copy = Arc::clone(&css_provider);
+    pub fn new() -> Self {
         let headerbar = gtk::HeaderBar::new();
-        let searchbar = Arc::new(SearchBar::new(css_provider));
-        let action_btns = action_buttons::ActionButtons::new(css_provider_copy);
+        let searchbar = Arc::new(SearchBar::new());
+        let action_btns = action_buttons::ActionButtons::new();
         headerbar.set_show_close_button(true);
 
         headerbar.set_custom_title(Some(searchbar.get_widget()));

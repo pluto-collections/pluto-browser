@@ -18,7 +18,7 @@ pub struct ActionButtons {
 }
 
 impl ActionButtons {
-    pub fn new(_css_provider: Arc<gtk::CssProvider>) -> Self {
+    pub fn new() -> Self {
         let previous_button = Arc::new(button::WebViewButton::new(Some("go-previous")));
         let next_button = Arc::new(button::WebViewButton::new(Some("go-next")));
         let refresh_button = Arc::new(button::WebViewButton::new(Some("view-refresh")));

@@ -1,5 +1,4 @@
 use gtk::prelude::{EntryExt, WidgetExt};
-use std::sync::Arc;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
 pub enum SearchType {
@@ -15,7 +14,7 @@ pub struct SearchBar {
 }
 
 impl SearchBar {
-    pub fn new(_css_provider: Arc<gtk::CssProvider>) -> Self {
+    pub fn new() -> Self {
         // Create a new SearchEntry
         let search_entry = gtk::Entry::new();
         search_entry.set_hexpand(true);

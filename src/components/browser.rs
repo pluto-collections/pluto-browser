@@ -24,8 +24,7 @@ impl Browser {
 
         stack_switcher.set_stack(Some(&*stack));
 
-        let css_provider = Arc::new(gtk::CssProvider::new());
-        let headerbar = Headerbar::new(css_provider);
+        let headerbar = Headerbar::new();
         headerbar.connect_with_browser(Arc::clone(&stack_switcher));
 
         let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
