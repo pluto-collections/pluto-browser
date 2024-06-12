@@ -9,7 +9,7 @@ use gtk::{
     prelude::{ContainerExt, EntryExt, HeaderBarExt, StackExt, StackSwitcherExt, WidgetExt},
     StackSwitcher,
 };
-use std::{io::Cursor, sync::Arc};
+use std::{env, io::Cursor, sync::Arc};
 use webkit2gtk::{WebView, WebViewExt};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -90,6 +90,8 @@ impl Headerbar {
 
 pub fn load_about_pages(uri: &String, stack_switcher: Arc<StackSwitcher>) {
     let about_type = get_about_type(uri);
+    let current_dir = env::current_dir().unwrap();
+    let base_uri = format!("file://{}/", current_dir.to_str().unwrap());
 
     // Assume `stack` is a gtk::Stack instance stored in the struct
     let current_widget = stack_switcher.stack().and_then(|stack| {
@@ -104,15 +106,15 @@ pub fn load_about_pages(uri: &String, stack_switcher: Arc<StackSwitcher>) {
         match about_type {
             AboutType::Home => {
                 let homepage_html = include_str!("../pages/homepage.html");
-                webview.load_html(homepage_html, None);
+                webview.load_html(homepage_html, Some(&base_uri));
             }
             AboutType::Blank => {
                 let blank_html = include_str!("../pages/blank.html");
-                webview.load_html(blank_html, None);
+                webview.load_html(blank_html, Some(&base_uri));
             }
             AboutType::Unknown => {
                 let unknown_html = include_str!("../pages/unknown.html");
-                webview.load_html(unknown_html, None);
+                webview.load_html(unknown_html, Some(&base_uri));
             }
         }
     }

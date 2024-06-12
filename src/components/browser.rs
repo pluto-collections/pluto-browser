@@ -5,6 +5,7 @@ use gtk::{
 use std::sync::Arc;
 use uuid::Uuid;
 use webkit2gtk::{SettingsExt, WebView, WebViewExt};
+use std::env;
 
 use super::headerbar::Headerbar;
 
@@ -63,8 +64,11 @@ impl Browser {
         settings.set_enable_developer_extras(true);
         let homepage_html = include_str!("../pages/homepage.html");
 
+        let current_dir = env::current_dir().unwrap();
+        let base_uri = format!("file://{}/", current_dir.to_str().unwrap());
+
         // by default, load homepage
-        webview.load_html(homepage_html, None);
+        webview.load_html(homepage_html, Some(&base_uri));
 
         let web_settings = WebViewExt::settings(&webview).unwrap();
         web_settings.set_enable_developer_extras(true);
@@ -131,7 +135,7 @@ impl Browser {
                     stack.remove(&current_child);
                     Self::switch_to_child_at_position(
                         Arc::clone(&stack),
-                        stack.children().len().saturating_sub(1),
+                        stack.children().len().saturating_sub(10),
                     );
                 } else {
                     gtk::main_quit();
